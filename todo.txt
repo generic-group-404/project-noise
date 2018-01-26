@@ -4,5 +4,5 @@ Models:
 
     - Han: RandomForest
     - Eemeli: Support Vector
-    - Sami: KNN
+    - Sami: k-NN
     - Juhani: Logistic Regression
