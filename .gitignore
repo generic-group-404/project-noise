@@ -102,3 +102,6 @@ ENV/
 
 # local resources
 *data/
+
+# Pycharm user config folder
+.idea/
