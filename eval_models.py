@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 
 import src.feature_extraction as features
 from models.svm_model import SVMModel
+from models.logistic_regression_model import LR_model
 from src.label_mapper import Mapper
 
 
@@ -20,17 +21,17 @@ def evaluate(data_path="data/"):
     y = mapper.fitted
 
     # Use only the 20% of the data set to speed up the training
-    #X_train, X_test, y_train, y_test = train_test_split(x_raw, y, test_size=.02, train_size=.1)
+    X_train, X_test, y_train, y_test = train_test_split(x_raw, y, test_size=.02, train_size=.1)
     
     # FULL CASE
-    X_train, X_test, y_train, y_test = train_test_split(x_raw, y, test_size=.2, train_size=.8)
+    # X_train, X_test, y_train, y_test = train_test_split(x_raw, y, test_size=.2, train_size=.8)
 
     # Extract the features after the split to avoid information loss
     X_train = features.straight_forward(X_train)
     X_test = features.straight_forward(X_test)
 
     # Add/remove tested models here
-    models = [SVMModel(), SVMModel('linear')]
+    models = [SVMModel(), SVMModel('linear'), LR_model()]
 
     # Iterate through models
     results = dict()
