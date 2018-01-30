@@ -102,6 +102,10 @@ ENV/
 
 # local resources
 *data/
+*results/
 
 # Pycharm user config folder
 .idea/
+
+# VS code:
+.vscode/
