@@ -8,9 +8,9 @@ class KNNModel(KNeighborsClassifier):
         KNeighborsClassifier.__init__(
             self,
             n_neighbors=5,
-            weights='uniform',
+            weights='distance',
             algorithm='brute',
-            leaf_size='30',
+            leaf_size='40',
             p=2,
             metric='minkowski',
             metric_params=None,
