@@ -7,13 +7,14 @@ class KNNModel(KNeighborsClassifier):
 
         KNeighborsClassifier.__init__(
             self,
+            n_neighbors=5,
             weights='uniform',
-            algorithm='auto',
+            algorithm='brute',
             leaf_size='30',
             p=2,
             metric='minkowski',
             metric_params=None,
-            n_jobs='1',
+            n_jobs=1,
         )
         self.__name = 'k-NN'
 

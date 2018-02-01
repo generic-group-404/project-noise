@@ -77,7 +77,7 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
 if __name__ == '__main__':
 
     # Add/Remove tested models here.
-    models = [SVMModel(), SVMModel('linear'), LR_model()]
+    models = [SVMModel(), SVMModel('linear'), LR_model(), KNNModel()]
 
     # Run the evaluation function
     evaluate(features.mean_over_time, models, submission=False, debug=True)
