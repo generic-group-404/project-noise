@@ -13,6 +13,7 @@ from sklearn.utils import shuffle
 import src.feature_extraction as features
 from models.logistic_regression_model import LR_model
 from models.svm_model import SVMModel
+from models.knn_model import KNNModel
 from src.cross_validation import cross_validation_data
 from src.label_mapper import Mapper
 from src.save_local_files import save_result
