@@ -21,7 +21,15 @@ from src.save_local_files import save_result
 
 
 def evaluate(method, models, data_path="data/", debug=True, submission=False):
+    """
+    Evaluate set of models. Models need to be Class with defined methods: fit(), predict() and __str__.
 
+    :param method: method to extract features. 
+    :param models: list of models to be evaluated
+    :param data_path: path for data and labels
+    :param debug: Displays the loop steps for user and trains with a smaller data set.
+    :param submission: Trains the model with the full data set and saves the predicted labels to a submission file.
+    """
     # Mapper inherits the sklearn LabelEncoder methods
     mapper = Mapper('{:s}y_train.csv'.format(data_path))
 
@@ -46,7 +54,7 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
     # Extract the features after the split to avoid information loss
     X_train = method(X_train)
     X_test = method(X_test)
-
+    
     # Iterate through models
     results = dict()
     for model in models:
@@ -60,6 +68,7 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
         # Predict the labels
         predicting_time = time()
         predictions = model.predict(X_test)
+
         meta['pre_time'] = time() - predicting_time
 
         if submission:
@@ -78,7 +87,7 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
 if __name__ == '__main__':
 
     # Add/Remove tested models here.
-    models = [SVMModel(), SVMModel('linear'), LR_model(), KNNModel(), RFCModel()]
+    models = [SVMModel()]#, SVMModel('linear'),SVMModel('poly'), LR_model(), KNNModel(), RFCModel()]
 
     # Run the evaluation function
     evaluate(features.mean_over_time, models, submission=False, debug=False)
