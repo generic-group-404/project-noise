@@ -14,6 +14,7 @@ import src.feature_extraction as features
 from models.logistic_regression_model import LR_model
 from models.svm_model import SVMModel
 from models.knn_model import KNNModel
+from models.rfc_model import RFCModel
 from src.cross_validation import cross_validation_data
 from src.label_mapper import Mapper
 from src.save_local_files import save_result
@@ -70,17 +71,17 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
             if debug:
                 print('{:s}: {:.6f}'.format(str(model), score))
             results[str(model)] = meta
-
+    print(results)
     return results
 
 
 if __name__ == '__main__':
 
     # Add/Remove tested models here.
-    models = [SVMModel(), SVMModel('linear'), LR_model(), KNNModel()]
+    models = [SVMModel(), SVMModel('linear'), LR_model(), KNNModel(), RFCModel()]
 
     # Run the evaluation function
-    evaluate(features.mean_over_time, models, submission=False, debug=True)
+    evaluate(features.mean_over_time, models, submission=False, debug=False)
 
     # add different path for data files:
     # example usage:
