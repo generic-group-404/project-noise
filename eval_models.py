@@ -15,6 +15,7 @@ from models.logistic_regression_model import LR_model
 from models.svm_model import SVMModel
 from models.knn_model import KNNModel
 from models.rfc_model import RFCModel
+from models.Linear_Discriminant_Analysis import LDA_model
 from src.cross_validation import cross_validation_data
 from src.label_mapper import Mapper
 from src.save_local_files import save_result
@@ -87,7 +88,7 @@ def evaluate(method, models, data_path="data/", debug=True, submission=False):
 if __name__ == '__main__':
 
     # Add/Remove tested models here.
-    models = [SVMModel()]#, SVMModel('linear'),SVMModel('poly'), LR_model(), KNNModel(), RFCModel()]
+    models = [SVMModel(), SVMModel('linear'),SVMModel('poly'), LR_model(), KNNModel(), RFCModel(),LDA_model()]
 
     # Run the evaluation function
     evaluate(features.mean_over_time, models, submission=False, debug=False)
