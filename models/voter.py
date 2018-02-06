@@ -4,10 +4,16 @@ import numpy as np
 
 class Voter:
 
-    def __init__(self, models):
-        """Constructor for the Voter class"""
+    def __init__(self, models, n=3):
+        """
+        Constructor for Voter class
+
+        :param models:
+        :param n:
+        """
         self.__models = models
         self.__name = 'voter'
+        self.__n = n
 
     def __str__(self):
         return self.__name
@@ -23,8 +29,9 @@ class Voter:
 
     def vote(self, sample):
         """Predicts the sample propability for each model and let them vote for the best label"""
+        zeros = [0 for x in range(self.__n)]
 
-        data = {'proba' : [0, 0, 0], 'class' : [0, 0, 0], 'models' : []}
+        data = {'proba' : zeros, 'class' : zeros}
         for model in self.__models:
             pred_list = list(model.predict_proba(sample)[0])
             pred_value = max(pred_list)
@@ -43,3 +50,5 @@ class Voter:
             # Else we pick the highest voted class
             return sorted(count, key=lambda x: count[x], reverse=True)[0]
 
+    #TODO add earn the voting threshold
+    #TODO add different council sizes
