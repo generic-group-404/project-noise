@@ -1,23 +1,18 @@
-from collections import Counter
 from sklearn.preprocessing import LabelEncoder
 
 
 class Mapper(LabelEncoder):
     """Class Mapper to give convinient interface for LabelEncoder"""
 
-    def __init__(self, path_for_labels):
+    def __init__(self, labels):
         """Constructor for the class"""
         super().__setattr__('__dict__', {})
 
         # Initialises the encoder
         LabelEncoder.__init__(self)
 
-        # Read the labels from path
-        with open(path_for_labels, 'r') as f:
-            self.__raw = [x.rstrip().split(",")[1] for x in f.readlines()[1:]]
-
-        self.fit(self.__raw)
-        self.fitted = self.transform(self.__raw)
+        self.fit(labels)
+        self.fitted = self.transform(labels)
 
     def __getattr__(self, key):
         """
