@@ -34,15 +34,21 @@ class DataSet:
             if shuffle_data:
                 X_train, y_train = shuffle(X_train, y_train)
 
-            if 'train_size' in kwargs and 'test_size' in kwargs:
-                test_value = kwargs['test_size']
+            if 'train_size' in kwargs:
                 train_value = kwargs['train_size']
 
                 tr_index = int(np.floor(X_train.shape[0] * train_value))
-                te_index = int(np.floor(X_test.shape[0] * test_value))
 
                 X_train = X_train[0:tr_index, :, :]
                 y_train = y_train[0:tr_index]
+
+            if 'test_size' in kwargs:
+                test_value = kwargs['test_size']
+
+                te_index = int(np.floor(X_test.shape[0] * train_value))
+
+                X_test = X_test[0:te_index, :, :]
+                y_test = y_test[0:te_index]
         else:
             # Otherwise loads the full data set
             X_train = np.load('{:s}X_train.npy'.format(data_path))
