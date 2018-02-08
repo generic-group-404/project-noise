@@ -1,5 +1,5 @@
 from copy import deepcopy
-from os import listdir
+from os import listdir, path
 
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -16,7 +16,6 @@ from models.svm_model import SVMModel
 from src.dataset import DataSet
 from src.save_local_files import save_analysis
 
-#TODO make a class
 
 class ModelData:
 
@@ -64,95 +63,134 @@ class ModelData:
         return pd.DataFrame(self.data[key])
 
 
-def get_models_data(models, methods, n, test_n, data_path='data/'):
+class Analysis:
 
-    interval = np.linspace(1, .1, num=n, dtype=np.float)
+    def __init__(self, models, methods, interval_n, test_n, data_path='data/', extend=False):
+        """
+        Constructor for class.
 
-    container = dict()
-    for model in models:
-        container[str(model)] = ModelData(model, test_n)
+        :param models:
+        :param methods:
+        :param interval_n:
+        :param test_n:
+        :param data_path:
+        :param extend:
+        """
+        self.__models = models
+        self.__methods = methods
+        self.__interval_n = interval_n
+        self.__test_n = test_n
+        self.__path = data_path
 
-    for method in methods:
-        for inter in interval:
-            print(inter)
-            train_size = round(inter * 0.8, 3)
-            test_size = round(inter * 0.2, 3)
+        self.__result_path = 'results/analysis_data/'
 
-            ds = DataSet(method, shuffle_data=True, test_size=test_size, train_size=train_size)
-            results = evaluate(deepcopy(models), ds, n=test_n, debug=False)
+        existing_data = self.check_data()
 
-            for result in results:
-                container[result] += {method.__name__ : results[result]}
+        if extend:
+            self.create_df(self.get_models_data())
+        elif existing_data:
+            models_not_found = [x[0] for x in zip(models, existing_data) if x[1]]
+            self.create_df(models_not_found)
 
-    return container
+    def get_models_data(self):
 
+        interval = np.linspace(1, .1, num=self.__interval_n, dtype=np.float)
 
-def create_df(data):
+        container = dict()
+        for model in self.__models:
+            container[str(model)] = ModelData(model, test_n)
 
-    for entry in data:
-        for key in list(data[entry].data.keys()):
-            df = data[entry].as_dataframe(key)
-            save_analysis(entry, key, data[entry].n, df)
+        for method in self.__methods:
+            for inter in interval:
+                train_size = round(inter * 0.8, 3)
+                test_size = round(inter * 0.2, 3)
 
+                ds = DataSet(method, shuffle_data=True, test_size=test_size, train_size=train_size)
+                results = evaluate(deepcopy(models), ds, n=test_n, debug=False)
 
-def data_exists(models, path='results/analysis_data/'):
-    return True
-    names = [str(x) for x in models]
-    for file in listdir(path):
-        if file.split('_')[0] in names:
-            pass
-    return True
+                for result in results:
+                    container[result] += {method.__name__ : results[result]}
 
+        return container
 
-def create_visualization(x_axis, y_axis, method_name, path='results/analysis_data/', debug=False):
+    def create_df(self, data):
 
-    style.use('ggplot')
+        for entry in data:
+            for key in list(data[entry].data.keys()):
+                df = data[entry].as_dataframe(key)
+                save_analysis(entry, key, data[entry].n, df, path=self.__result_path)
 
-    min_x = []
-    max_x = []
+    def check_data(self):
+        """Checks the results path for existing data and returns a boolean list of existing data for each model"""
+        if path.exists(path):
+            return [True for x in models]
 
-    plt.figure(figsize=(8,6))
-    for file in listdir(path):
-        df = pd.read_csv(path + file)
-        name = file.split('_')[0]
+        files = [x.split('_')[0] for x in listdir(self.__result_path)]
+        out = []
+        for model in self.__models:
+            if str(model) in files:
+                out.append(False)
+            else:
+                out.append(True)
+        return out
 
-        x = list(df[x_axis])
-        y = list(df[y_axis])
+    def create_visualization(self, x_axis, y_axis, method_name, path=None, debug=False, fig_path='figures'):
 
-        plt.plot(x, y, lw=2, label=name)
+        style.use('ggplot')
 
-        min_x.append(min(x))
-        max_x.append(max(x))
+        plt.figure(figsize=(8,6))
 
-        n = file.split('_')[1]
+        min_x = []
+        max_x = []
 
-    plt.legend(loc='best')
-    
-    plt.ylim(ymax=1, ymin=0)
-    plt.xlim(xmax=max(max_x), xmin=min(min_x))
-    
-    plt.xticks(rotation=45)
-    plt.xlabel(x_axis)
-    plt.ylabel(y_axis)
-    
-    plt.title('{:s}_{:s}'.format(method_name, n))
+        if not path:
+            data_path = self.__result_path
+        else:
+            data_path = path
 
-    plt.savefig('figure.png')
-    
-    if debug:
-        plt.show()
+        for file in listdir(data_path):
+
+            if method_name in file:
+                df = pd.read_csv(path + file)
+                name = file.split('_')[0]
+
+                x = list(df[x_axis])
+                y = list(df[y_axis])
+
+                plt.plot(x, y, lw=2, label=name)
+
+                min_x.append(min(x))
+                max_x.append(max(x))
+
+                n = file.split('_')[1]
+
+        plt.legend(loc='best')
+
+        plt.ylim(ymax=1, ymin=0)
+        plt.xlim(xmax=max(max_x), xmin=min(min_x))
+
+        plt.xticks(rotation=45)
+        plt.xlabel(x_axis)
+        plt.ylabel(y_axis)
+
+        file_name = '{:s}_{:s}'.format(method_name, n)
+
+        plt.title(file_name)
+        plt.savefig('{:s}/{:s}.png'.format(fig_path, file_name))
+
+        if debug:
+            plt.show()
 
 
 if __name__ == '__main__':
 
     models = [SVMModel(), SVMModel('linear'), SVMModel('poly'), LR_model(), KNNModel(), RFCModel(), LDA_model()]
-    methods = [fs.mean_over_time]#, fs.mean_over_freq]
-    #fs.straight_forward,
-    if data_exists(models):
-        create_df(get_models_data(models, methods, 100, 10))
+    methods = [fs.mean_over_time]#, fs.mean_over_freq, fs.straight_forward]
+
+    a = Analysis(models, methods, 10, 5)
 
     vis = [
         ('tr_n', 'score')
     ]
     for v in vis:
-        create_visualization(v[0], v[1], 'mot', debug=True)
+        a.create_visualization(v[0], v[1], 'mot', debug=True)
