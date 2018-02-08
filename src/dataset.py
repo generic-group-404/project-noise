@@ -31,8 +31,6 @@ class DataSet:
             # Loads the training and testing data using cross_validation data
             X_train, X_test, y_train, y_test = cross_validation_data(data_path)
             # Splits the data into smaller portions if needed
-            if shuffle_data:
-                X_train, y_train = shuffle(X_train, y_train)
 
             if 'train_size' in kwargs:
                 train_value = kwargs['train_size']
@@ -45,7 +43,7 @@ class DataSet:
             if 'test_size' in kwargs:
                 test_value = kwargs['test_size']
 
-                te_index = int(np.floor(X_test.shape[0] * train_value))
+                te_index = int(np.floor(X_test.shape[0] * test_value))
 
                 X_test = X_test[0:te_index, :, :]
                 y_test = y_test[0:te_index]
@@ -56,17 +54,33 @@ class DataSet:
             y_train = load_labels('{:s}y_train.csv'.format(data_path))
             y_test = y_train
 
+        self.mapper = Mapper(y_train)
+        self.y_train = self.mapper.fitted
+        self.y_test = self.mapper.transform(y_test)
+
         if n:
-            self.X_train = feature.split_extract_data(method, n, 0, X_train)
-            self.X_test = feature.split_extract_data(method, n, 0, X_test)
+            ax = 0
+            if 'axis' in kwargs:
+                ax = kwargs['axis']
+
+            self.X_train = feature.split_extract_data(method, n, ax, X_train)
+            self.X_test = feature.split_extract_data(method, n, ax, X_test)
+            self.X_train, self.y_train = feature.ravel_splitted_data(self.X_train, self.y_train)
+            try:
+                if kwargs['ravel_test']:
+                    self.X_test, self.y_test = feature.ravel_splitted_data(self.X_test, self.y_test)
+            except KeyError:
+                pass
+
         else:
             self.X_train = method(X_train)
             self.X_test = method(X_test)
 
-        self.mapper = Mapper(y_train)
+        if shuffle_data:
+            self.X_train, self.y_train = shuffle(self.X_train, self.y_train)
 
-        self.y_train = self.mapper.fitted
-        self.y_test = self.mapper.transform(y_test)
+        print(self.X_train.shape)
+        print(self.X_test.shape)
 
     def __getattr__(self, key):
         """
