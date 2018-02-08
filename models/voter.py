@@ -2,24 +2,27 @@ from collections import Counter
 
 import numpy as np
 
-class Voter:
+class SimpleVoter:
 
-    def __init__(self, models, n=3):
+    def __init__(self, models, council=3):
         """
         Constructor for Voter class
 
         :param models:
-        :param n:
+        :param council:
+        :param threshold:
         """
         self.__models = models
-        self.__name = 'voter'
-        self.__n = n
+        self.__council = council
+
+        self.__name = self.__name__
 
     def __str__(self):
         return self.__name
 
     def fit(self, X_train, y_train):
         """Trains the modesl with given data X_train and labels y_train"""
+
         for model in self.__models:
             model.fit(X_train, y_train)
 
@@ -29,7 +32,7 @@ class Voter:
 
     def vote(self, sample):
         """Predicts the sample propability for each model and let them vote for the best label"""
-        zeros = [0 for x in range(self.__n)]
+        zeros = [0 for x in range(self.__council)]
 
         data = {'proba' : zeros, 'class' : zeros}
         for model in self.__models:
@@ -43,12 +46,52 @@ class Voter:
 
         count = Counter(data['class'])
 
-        if len(list(count.values())) > 2:
+        if len(list(count.values())) > int(np.ceil(self.__council / 2)):
             # Listen to the most certain classifier in the case of draw
             return data['class'][data['proba'].index(max(data['proba']))]
         else:
             # Else we pick the highest voted class
             return sorted(count, key=lambda x: count[x], reverse=True)[0]
 
-    #TODO add earn the voting threshold
-    #TODO add different council sizes
+
+class PartialVoter(SimpleVoter):
+
+    def __init__(self, models, council=3, threshold=None):
+        """
+        Constructor for Voter class
+
+        :param models:
+        :param council:
+        :param threshold:
+        """
+        SimpleVoter.__init__(models, council)
+
+        self.__threshold = threshold
+
+        self.__name = self.__name__
+
+    def __str__(self):
+        return self.__name
+
+    def fit(self, X_train, y_train):
+        """Trains the modesl with given data X_train and labels y_train"""
+
+        for model in self.__models:
+            model.fit(X_train, y_train)
+
+    def predict(self, X_test):
+        """Predict best labels for given samples X_test"""
+        return np.array([self.partial_vote(np.reshape(x,(1, x.shape[0]))) for x in X_test])
+
+    def partial_vote(self, data_slice):
+        
+        result = [self.vote(x) for x in data_slice]
+        part_size = len(result)
+
+        count = Counter(result)
+        
+        if len(list(count.values())) > int(np.ceil(part_size / 2)):
+
+        else:
+            return sorted(count, key=lambda x: count[x], reverse=True)[0]
+            
