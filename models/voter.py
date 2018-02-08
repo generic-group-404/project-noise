@@ -8,21 +8,19 @@ class SimpleVoter:
         """
         Constructor for Voter class
 
-        :param models:
-        :param council:
-        :param threshold:
+        :param models: Models that will be voting
+        :param council: Council size, how many models get to vote
         """
         self.__models = models
         self.__council = council
 
-        self.__name = self.__name__
+        self.__name = 'SimpleVoter'
 
     def __str__(self):
         return self.__name
 
     def fit(self, X_train, y_train):
         """Trains the modesl with given data X_train and labels y_train"""
-
         for model in self.__models:
             model.fit(X_train, y_train)
 
@@ -64,34 +62,22 @@ class PartialVoter(SimpleVoter):
         :param council:
         :param threshold:
         """
-        SimpleVoter.__init__(models, council)
+        SimpleVoter.__init__(self, models, council)
 
         self.__threshold = threshold
 
-        self.__name = self.__name__
+        self.__name = 'PartialVoter'
 
     def __str__(self):
         return self.__name
 
-    def fit(self, X_train, y_train):
-        """Trains the modesl with given data X_train and labels y_train"""
-
-        for model in self.__models:
-            model.fit(X_train, y_train)
-
     def predict(self, X_test):
         """Predict best labels for given samples X_test"""
-        return np.array([self.partial_vote(np.reshape(x,(1, x.shape[0]))) for x in X_test])
+        return np.array([self.partial_vote(x) for x in X_test])
 
     def partial_vote(self, data_slice):
         
-        result = [self.vote(x) for x in data_slice]
-        part_size = len(result)
-
+        result = [self.vote(np.reshape(x,(1, x.shape[0]))) for x in data_slice]
         count = Counter(result)
-        
-        if len(list(count.values())) > int(np.ceil(part_size / 2)):
-
-        else:
-            return sorted(count, key=lambda x: count[x], reverse=True)[0]
-            
+        print(count)
+        return sorted(count, key=lambda x: count[x], reverse=True)[0]
