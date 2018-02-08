@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 class LDA_model(LDA):
@@ -19,4 +17,3 @@ class LDA_model(LDA):
 
     def __str__(self):
         return self.__name
-

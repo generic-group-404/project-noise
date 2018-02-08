@@ -22,7 +22,7 @@ class LR_model(LogisticRegression):
             warm_start=False,
             n_jobs=1,
         )
-        self.__name = 'LogisticRegression'
+        self.__name = 'LR'
 
     def __str__(self):
         return self.__name

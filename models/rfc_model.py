@@ -8,9 +8,9 @@ class RFCModel(RandomForestClassifier):
         # Toggle settings here
         RandomForestClassifier.__init__(
             self,
-            n_estimators=100,
+            n_estimators=250,
             criterion='gini',
-            max_features='auto',
+            max_features='log2',
             max_depth=None,
             min_samples_leaf=1,
             min_weight_fraction_leaf=0,
@@ -22,7 +22,7 @@ class RFCModel(RandomForestClassifier):
             warm_start=False,
             class_weight='balanced'
         )
-        self.__name = 'RandomForestClassifier'
+        self.__name = 'RFC'
 
     def __str__(self):
         """Returns the name of the model"""
