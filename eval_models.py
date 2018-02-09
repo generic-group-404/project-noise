@@ -10,13 +10,13 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 
 import src.feature_extraction as features
-from models.knn_model import KNNModel
-from models.Linear_Discriminant_Analysis import LDA_model
-from models.logistic_regression_model import LR_model
-from models.rfc_model import RFCModel
-from models.svm_model import SVMModel
+from models.knn_model import KNN_model
+from models.lda_model import LDA_model
+from models.lr_model import LR_model
+from models.rfc_model import RFC_model
+from models.svm_model import SVM_model
 from src.dataset import DataSet
-
+from models.voter import PartialVoter, SimpleVoter
 
 def evaluate(models, ds, n=1, debug=True):
     """
@@ -71,13 +71,12 @@ def evaluate(models, ds, n=1, debug=True):
 if __name__ == '__main__':
 
     # Create the dataset
-    ds = DataSet(features.mean_over_time, shuffle=True, train_size=.2, test_size=.02)
+    ds = DataSet(features.mean_over_time, shuffle=True)
 
     # Add/Remove tested models here.
-    models = [SVMModel(), SVMModel('linear'), SVMModel('poly'), LR_model(), KNNModel(), RFCModel(), LDA_model()]
+    models = [SVM_model(), SVM_model('linear'), SVM_model('poly'), LR_model(), KNN_model(), RFC_model(), LDA_model()]
 
-    # Run the evaluation function
-    print(evaluate(models, ds, n=10, debug=False))
+    print(evaluate(models, ds, debug=True))
 
     # add different path for data files:
     # example usage:
