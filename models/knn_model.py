@@ -1,7 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 
 
-class KNNModel(KNeighborsClassifier):
+class KNN_model(KNeighborsClassifier):
 
     def __init__(self):
 

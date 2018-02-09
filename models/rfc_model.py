@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 
 
-class RFCModel(RandomForestClassifier):
+class RFC_model(RandomForestClassifier):
 
     def __init__(self):
 
