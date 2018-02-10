@@ -1,10 +1,12 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+from sklearn.preprocessing import normalize
 
 import src.feature_extraction as feature
 from src.cross_validation import cross_validation_data
 from src.label_mapper import Mapper
+
 
 class DataSet:
 
@@ -15,6 +17,7 @@ class DataSet:
         n=None, 
         full=False,
         shuffle_data=False,
+        norm=False,
         **kwargs):
         """
         Constructor for the class
@@ -27,6 +30,7 @@ class DataSet:
         """
         super().__setattr__('__dict__', {})
 
+        self.method = method
         if not full:
             # Loads the training and testing data using cross_validation data
             X_train, X_test, y_train, y_test = cross_validation_data(data_path)
@@ -55,6 +59,7 @@ class DataSet:
             y_test = y_train
 
         self.mapper = Mapper(y_train)
+
         self.y_train = self.mapper.fitted
         self.y_test = self.mapper.transform(y_test)
 
@@ -76,11 +81,15 @@ class DataSet:
             self.X_train = method(X_train)
             self.X_test = method(X_test)
 
+        if norm:
+            self.X_train = normalize(self.X_train)
+            self.X_test = normalize(self.X_test)
+
         if shuffle_data:
             self.X_train, self.y_train = shuffle(self.X_train, self.y_train)
 
-        print(self.X_train.shape)
-        print(self.X_test.shape)
+    def __str__(self):
+        return convert_method_name(self.method.__name__)
 
     def __getattr__(self, key):
         """
@@ -101,6 +110,12 @@ class DataSet:
             self.__dict__[key] = value
         else:
             super().__setattr__(key, value)
+
+
+def convert_method_name(method_string):
+
+    letters = [x[0] for x in method_string.split('_')]
+    return ''.join(letters).upper()
 
 
 def load_labels(path):
