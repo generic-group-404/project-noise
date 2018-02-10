@@ -25,14 +25,15 @@ if __name__ == '__main__':
 
     sys.path.append('.')
 
-    from param_test import test_regularization, test_penalty, test_solver
+    from param_test import ParamTester
     from src.dataset import DataSet
     from src.feature_extraction import mean_over_time
-    
+
     ds = DataSet(method=mean_over_time)
 
-    #solver_list = ['svd', 'lsqr', 'eigen']
     solver_list = ['lsqr', 'eigen']
-    # svd and lsqr solvers were equal in terms of pure accuracy
-    # best shrinkage value so far: 0.0041036036
-    test_solver(solver_list, [LDA_model()], ds, visualize=True, debug=True, test_shrink=True, n=1000)
+
+    test = ParamTester(ds, LDA_model(), iter_method = {'shrinkage':10}, debug=True)
+    test.run()
+    test.save_results()
+    #test.plot()

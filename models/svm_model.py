@@ -39,13 +39,14 @@ if __name__ == '__main__':
 
     sys.path.append('.')
 
-    from param_test import test_regularization
+    from param_test import ParamTester
 
     from src.dataset import DataSet
     from src.feature_extraction import mean_over_time
-    
-    ds = DataSet(method=mean_over_time, shuffle=True, n=2, ravel_test=True, ax=1)
 
-    models = [SVM_model('rbf'), SVM_model('linear'), SVM_model('poly')]
-    #models = [SVM_model('rbf')]
-    test_regularization(n=100, models=models, ds=ds, visualize=True, debug=True)
+    ds = DataSet(method=mean_over_time, shuffle=True, train_size=.5)
+
+    test = ParamTester(ds, SVM_model('linear'), iter_method = {'C':10}, debug=True)
+    test.run()
+    test.save_results()
+    #test.plot()

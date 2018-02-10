@@ -33,14 +33,13 @@ if __name__ == '__main__':
 
     sys.path.append('.')
 
-    from param_test import test_regularization, test_penalty
+    from param_test import ParamTester
     from src.dataset import DataSet
     from src.feature_extraction import mean_over_time
-    
-    ds = DataSet(method=mean_over_time)
-    #test_regularization(n=1000, models=[LR_model()], ds=ds, visualize=True)
 
-    penalties_list = ['l1', 'l2']
-    #test_penalty([LR_model()], penalties_list, ds, visualize=True, n=1000, debug=True)
-    test_regularization(1000, [LR_model()], ds, visualize=True, debug=True)
-    #best so far: 0.908918018018018
+    ds = DataSet(method=mean_over_time)
+
+    test = ParamTester(ds, LR_model(), iter_method = {'C':10}, debug=True)
+    test.run()
+    test.save_results()
+    #test.plot()
