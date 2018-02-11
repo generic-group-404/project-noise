@@ -8,11 +8,11 @@ import pandas as pd
 
 import src.feature_extraction as fs
 from eval_models import evaluate
-from models.knn_model import KNNModel
-from models.Linear_Discriminant_Analysis import LDA_model
-from models.logistic_regression_model import LR_model
-from models.rfc_model import RFCModel
-from models.svm_model import SVMModel
+from models.knn_model import KNN_model
+from models.lda_model import LDA_model
+from models.lr_model import LR_model
+from models.rfc_model import RFC_model
+from models.svm_model import SVM_model
 from src.dataset import DataSet
 from src.save_local_files import save_analysis
 
@@ -98,7 +98,7 @@ class Analysis:
 
         container = dict()
         for model in self.__models:
-            container[str(model)] = ModelData(model, test_n)
+            container[str(model)] = ModelData(model, self.__test_n)
 
         for method in self.__methods:
             for inter in interval:
@@ -106,7 +106,7 @@ class Analysis:
                 test_size = round(inter * 0.2, 3)
 
                 ds = DataSet(method, shuffle_data=True, test_size=test_size, train_size=train_size)
-                results = evaluate(deepcopy(models), ds, n=test_n, debug=False)
+                results = evaluate(deepcopy(models), ds, n=self.__test_n, debug=False)
 
                 for result in results:
                     container[result] += {method.__name__ : results[result]}
