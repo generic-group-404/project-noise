@@ -89,7 +89,7 @@ class ParamTester:
                         self.data[str(model)] = results
                         self.hists.append(str(model))
 
-        print(self.data)
+        print(get_best(self.data, self.ranges))
 
     def save_results(self, path='results'):
 
@@ -166,14 +166,10 @@ def get_best(data, c):
     """Iterate through the results and selects the best result"""
     best = {'score':0, 'c':None, 'model':None}
     for key in data:
-        if c.any():
-            acc = max(data[key])
-            if(acc > best['score']):
-                best['score'] = acc
-                best['c'] = c[data[key].index(acc)]
-                best['model'] = key
-        else:
-            if data[key] > best['score']:
-                best['score'] = data[key]
-                best['model'] = key
+        
+        acc = max(data[key])
+        if(acc > best['score']):
+            best['score'] = acc
+            best['c'] = c[key][data[key].index(acc)]
+            best['model'] = key
     return best
