@@ -1,4 +1,8 @@
 import numpy as np
+from librosa import load, db_to_power
+from librosa.decompose import nn_filter
+from librosa.feature import mfcc, rmse
+from sklearn.preprocessing import normalize
 
 
 def straight_forward(raw):
@@ -30,3 +34,44 @@ def ravel_splitted_data(X, y):
             r_X.append(entry)
             r_y.append(y[i])
     return np.array(r_X), np.array(r_y)
+
+
+def norm_data(raw):
+    """Normalizes every sample in the data"""
+    return np.array([normalize(x) for x in raw])
+
+
+def image_format(raw):
+    """Formats the data to simple grayscale format"""
+    return np.array([x.reshape(x.shape[0], x.shape[1], 1) for x in raw])
+
+
+def combine_data(*data):
+    """Stacks the data"""
+    out = []
+    for i in range(data[0].shape[0]):
+        out.append(np.dstack(tuple([x[i] for x in data])))
+    return np.array(out)
+
+
+def pad_for_imagenet(raw):
+    """Adds the extra zeros in the end of raw data"""
+    data = []
+    for row in raw:
+        empty = np.zeros((48, row.shape[1]))
+        empty[0:row.shape[0],:] = row
+        data.append(empty)
+    return np.array(data)
+
+def mfcc_spec(raw):
+    """Calculates the Mel-frequency cepstral coefficients for each sample in data"""
+    return np.array([mfcc(S=x, n_mfcc=x.shape[0]) for x in raw])
+
+
+def rmse_spec(raw):
+    """Calculates the root-mean-square energy for each sample in data."""
+    return np.array([rmse(S=x) for x in raw])
+
+def filter_by_nn(raw):
+    """Filters the data using nn -method"""
+    return np.array([nn_filter(x, aggregate=np.median, metric='cosine') for x in raw])
