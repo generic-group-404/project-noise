@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
-from sklearn.preprocessing import normalize
 
 import src.feature_extraction as feature
 from src.cross_validation import cross_validation_data
@@ -12,12 +11,12 @@ class DataSet:
 
     def __init__(
         self, 
-        method, 
+        method=None, 
         data_path='data/', 
-        n=None, 
         full=False,
         shuffle_data=False,
         norm=False,
+        padd=False,
         **kwargs):
         """
         Constructor for the class
@@ -63,30 +62,26 @@ class DataSet:
         self.y_train = self.mapper.fitted
         self.y_test = self.mapper.transform(y_test)
 
-        if n:
-            ax = 0
-            if 'axis' in kwargs:
-                ax = kwargs['axis']
-
-            self.X_train = feature.split_extract_data(method, n, ax, X_train)
-            self.X_test = feature.split_extract_data(method, n, ax, X_test)
-            self.X_train, self.y_train = feature.ravel_splitted_data(self.X_train, self.y_train)
-            try:
-                if kwargs['ravel_test']:
-                    self.X_test, self.y_test = feature.ravel_splitted_data(self.X_test, self.y_test)
-            except KeyError:
-                pass
-
-        else:
+        if method:
             self.X_train = method(X_train)
             self.X_test = method(X_test)
+        else:
+            self.X_train = X_train
+            self.X_test = X_test
 
         if norm:
-            self.X_train = normalize(self.X_train)
-            self.X_test = normalize(self.X_test)
+            self.X_train = feature.norm_data(self.X_train)
+            self.X_test = feature.norm_data(self.X_test)
+
+        if padd:
+            self.X_train = feature.pad_for_imagenet(self.X_train)
+            self.X_test = feature.pad_for_imagenet(self.X_test)
 
         if shuffle_data:
             self.X_train, self.y_train = shuffle(self.X_train, self.y_train)
+
+        print(self.X_train.shape)
+        print(self.X_test.shape)
 
     def __str__(self):
         return convert_method_name(self.method.__name__)
