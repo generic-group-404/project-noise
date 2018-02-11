@@ -51,16 +51,16 @@ def get_fig_file(name, *tags, path='figures'):
     
     name_base = '{:s}_{:s}_'.format(name, '_'.join(tags))
 
-    index = find_file_index(path, name_base)
+    index = find_file_index(path, name_base, form='.png')
 
     return os.path.join(path, (name_base + str(index) + '.png'))
 
 
-def find_file_index(path, name):
+def find_file_index(path, name, form='.csv'):
     """Finds the current index for file"""
     index = 0
     if os.listdir(os.path.join(path)):
-        indexes = sorted([int(f.split(name)[1].split('.csv')[0]) for f in os.listdir(path) if name in f], reverse=True)
+        indexes = sorted([int(f.split(name)[1].split(form)[0]) for f in os.listdir(path) if name in f], reverse=True)
         if indexes:
             index = indexes[0] + 1
     return index
