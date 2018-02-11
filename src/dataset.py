@@ -17,13 +17,13 @@ class DataSet:
         shuffle_data=False,
         norm=False,
         padd=False,
+        balance=False,
         **kwargs):
         """
         Constructor for the class
 
         :param data_path:
         :param method:
-        :param n:
         :param full:
         :param kwargs:
         """
@@ -76,6 +76,10 @@ class DataSet:
         if padd:
             self.X_train = feature.pad_for_imagenet(self.X_train)
             self.X_test = feature.pad_for_imagenet(self.X_test)
+
+        if balance:
+            self.X_train, self.y_train = feature.balanced_subsample(self.X_train, self.y_train)
+            self.X_test, self.y_test = feature.balanced_subsample(self.X_test, self.y_test)
 
         if shuffle_data:
             self.X_train, self.y_train = shuffle(self.X_train, self.y_train)
