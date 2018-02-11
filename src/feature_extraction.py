@@ -1,8 +1,11 @@
+from collections import Counter
+
 import numpy as np
-from librosa import load, db_to_power
+from librosa import db_to_power, load
 from librosa.decompose import nn_filter
 from librosa.feature import mfcc, rmse
 from sklearn.preprocessing import normalize
+from sklearn.utils import shuffle
 
 
 def straight_forward(raw):
@@ -63,6 +66,7 @@ def pad_for_imagenet(raw):
         data.append(empty)
     return np.array(data)
 
+
 def mfcc_spec(raw):
     """Calculates the Mel-frequency cepstral coefficients for each sample in data"""
     return np.array([mfcc(S=x, n_mfcc=x.shape[0]) for x in raw])
@@ -72,6 +76,31 @@ def rmse_spec(raw):
     """Calculates the root-mean-square energy for each sample in data."""
     return np.array([rmse(S=x) for x in raw])
 
+
 def filter_by_nn(raw):
     """Filters the data using nn -method"""
     return np.array([nn_filter(x, aggregate=np.median, metric='cosine') for x in raw])
+
+
+def balanced_subsample(X, y):
+    """Balances the data to even sample sizes"""
+    count = Counter(y)
+    smallest = sorted(count.values())[0]
+    data = [(value, X[(y == value)]) for value in count.keys()]
+
+    xs = []
+    ys = []
+    for ci, this_xs in data:
+        if len(this_xs) > smallest:
+            np.random.shuffle(this_xs)
+
+        x_ = this_xs[:smallest]
+        y_ = np.empty(smallest, dtype=int)
+        y_.fill(ci)
+
+        xs.append(x_)
+        ys.append(y_)
+
+    xs, ys = shuffle(np.concatenate(xs), np.concatenate(ys))
+
+    return xs, ys
