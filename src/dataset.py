@@ -1,4 +1,5 @@
 import numpy as np
+from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
@@ -18,6 +19,8 @@ class DataSet:
         norm=False,
         padd=False,
         balance=False,
+        categorical=False,
+        combine=None,
         **kwargs):
         """
         Constructor for the class
@@ -83,6 +86,14 @@ class DataSet:
 
         if shuffle_data:
             self.X_train, self.y_train = shuffle(self.X_train, self.y_train)
+
+        if categorical:
+            self.y_train = to_categorical(self.y_train, num_classes=15)
+            self.y_test = to_categorical(self.y_test, num_classes=15)
+
+        if combine:
+            self.X_train = feature.combine_data([self.X_train for x in range(combine)])
+            self.X_test = feature.combine_data([self.X_test for x in range(combine)])
 
         print(self.X_train.shape)
         print(self.X_test.shape)
